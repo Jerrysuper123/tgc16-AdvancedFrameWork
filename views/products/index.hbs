@@ -1,0 +1,33 @@
+{{#extends "base"}}
+{{#block "content"}}
+<h1>product list</h1>
+<a class="btn btn-info" href="/products/create">add new</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Cost</th>
+                <th>Description</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each products}}
+                <tr>
+                    <td>
+                        {{this.id}}
+                    </td>
+                    <td>{{this.name}}</td>
+                    <td>{{this.cost}}</td>
+                    <td>{{this.description}}</td>
+                    <td>
+                    <a class="btn btn-success" href="/products/{{this.id}}/update">update</a>
+                     <a class="btn btn-danger" href="/products/{{this.id}}/delete">delete</a></td>
+                </tr>
+            {{/each}}
+        </tbody>
+
+    </table>
+{{/block}}
+{{/extends}}
