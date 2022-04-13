@@ -10,6 +10,7 @@
                 <th>Category</th>
                 <th>Cost</th>
                 <th>Description</th>
+                <th>Tags</th>
                 <th></th>
             </tr>
         </thead>
@@ -23,6 +24,11 @@
                     <td>{{this.category.name}}</td>
                     <td>{{this.cost}}</td>
                     <td>{{this.description}}</td>
+                    <td>
+                        {{#each this.tags}}
+                        <span class="badge bg-primary">{{this.name}}</span>
+                        {{/each}}
+                    </td>
                     <td>
                     <a class="btn btn-success" href="/products/{{this.id}}/update">update</a>
                      <a class="btn btn-danger" href="/products/{{this.id}}/delete">delete</a></td>
