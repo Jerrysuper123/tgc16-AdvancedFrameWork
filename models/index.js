@@ -5,6 +5,7 @@ const bookshelf = require("../bookshelf");
 const Product = bookshelf.model("Product", {
   tableName: "products",
 
+  // this causes withRelated to load
   category() {
     return this.belongsTo("Category");
   },
