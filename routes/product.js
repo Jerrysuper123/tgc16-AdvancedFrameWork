@@ -67,6 +67,13 @@ router.post("/create", async (req, res) => {
         //new row product, call tags() relationship then attach the tags data
         await product.tags().attach(tags.split(","));
       }
+
+      //creation of a flash message
+      req.flash(
+        "success_messages",
+        `New product ${product.get("name")} has been created`
+      );
+
       res.redirect("/products");
     },
 

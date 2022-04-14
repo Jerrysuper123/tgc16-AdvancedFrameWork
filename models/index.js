@@ -28,4 +28,9 @@ const Category = bookshelf.model("Category", {
   },
 });
 
-module.exports = { Product, Category, Tag };
+//model is singlular capitalized letter
+const User = bookshelf.model("User", {
+  tableName: "users",
+});
+
+module.exports = { Product, Category, Tag, User };
