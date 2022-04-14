@@ -3,6 +3,13 @@ const router = express.Router();
 
 const crypto = require("crypto");
 
+//hash256 hash function
+const getHashedPassword = (password) => {
+  const sha256 = crypto.createHash("sha256");
+  const hash = sha256.update(password).digest("base64");
+  return hash;
+};
+
 const { User } = require("../models");
 
 const {
@@ -26,7 +33,7 @@ router.post("/register", (req, res) => {
       // create a new row in the User table/class
       const user = new User({
         username: form.data.username,
-        password: form.data.password,
+        password: getHashedPassword(form.data.password),
         email: form.data.email,
       });
       await user.save();
@@ -62,13 +69,15 @@ router.post("/login", (req, res) => {
         require: false,
       });
 
+      console.log("user existed in db", user);
+
       //if there such a user by email
       if (!user) {
         req.flash("error_messages", "Sorry, the auth details does not work");
         res.redirect("/users/login");
       } else {
         //check if password matches
-        if (user.get("password") === form.data.password) {
+        if (user.get("password") === getHashedPassword(form.data.password)) {
           //store user details in session
           req.session.user = {
             id: user.get("id"),
@@ -82,7 +91,7 @@ router.post("/login", (req, res) => {
           res.redirect("/users/profile");
         } else {
           req.flash("error_messages", "Sorry, the auth details does not work");
-          req.redirect("/users/login");
+          res.redirect("/users/login");
         }
       }
     },

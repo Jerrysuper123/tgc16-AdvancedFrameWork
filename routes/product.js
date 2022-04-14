@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { Product, Category, Tag } = require("../models");
 const { bootstrapField, createProductForm } = require("../forms");
+const { checkIfAuthenticated } = require("../middlewares");
 
 router.get("/", async (req, res) => {
   let products = await Product.collection().fetch({
@@ -25,7 +26,7 @@ const getAllTags = async () => {
   return allTags;
 };
 
-router.get("/create", async (req, res) => {
+router.get("/create", checkIfAuthenticated, async (req, res) => {
   // const allCategories = await Category.fetchAll().map((cat) => {
   //   return [cat.get("id"), cat.get("name")];
   // });
@@ -46,7 +47,7 @@ const getAllCategories = async () => {
   return allCategories;
 };
 
-router.post("/create", async (req, res) => {
+router.post("/create", checkIfAuthenticated, async (req, res) => {
   const allCategories = await getAllCategories();
 
   const productForm = createProductForm(allCategories);

@@ -39,8 +39,14 @@ app.use(
 //for this app to use flash message
 app.use(flash());
 
+//add global middlewares
+app.use((req, res, next) => {
+  res.locals.user = req.session.user;
+  next();
+});
+
 // Register Flash middleware
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   //make messages below available to the variables in the HBS
   res.locals.success_messages = req.flash("success_messages");
   res.locals.error_messages = req.flash("error_messages");
