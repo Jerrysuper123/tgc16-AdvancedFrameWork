@@ -7,6 +7,7 @@ require("dotenv").config();
 const session = require("express-session");
 const flash = require("connect-flash");
 const FileStore = require("session-file-store")(session);
+const csrf = require("csurf");
 
 let app = express();
 app.set("view engine", "hbs");
@@ -50,6 +51,17 @@ app.use((req, res, next) => {
   //make messages below available to the variables in the HBS
   res.locals.success_messages = req.flash("success_messages");
   res.locals.error_messages = req.flash("error_messages");
+  next();
+});
+
+//has to be behind the session
+app.use(csrf());
+
+//global middleshare to share each token applied to all routes
+app.use(function (req, res, next) {
+  //req.csrfToken generates a new token and saved to current session file
+  //then made available to res hbs
+  res.locals.csrfToken = req.csrfToken();
   next();
 });
 
