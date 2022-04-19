@@ -2,21 +2,96 @@ const express = require("express");
 const router = express.Router();
 
 const { Product, Category, Tag } = require("../models");
-const { bootstrapField, createProductForm } = require("../forms");
+const {
+  bootstrapField,
+  createProductForm,
+  createSearchForm,
+} = require("../forms");
 const { checkIfAuthenticated } = require("../middlewares");
 
 router.get("/", async (req, res) => {
-  let products = await Product.collection().fetch({
-    //append cat into product table
-    withRelated: ["category", "tags"],
-    //append tags to the products
+  const allCategories = (await Category.fetchAll()).map((category) => {
+    return [category.get("id"), category.get("name")];
   });
-  console.log("products", products.toJSON());
 
-  res.render("products/index", {
-    //convert data into json format
-    products: products.toJSON(),
+  allCategories.unshift([0, "----"]);
+
+  const allTags = (await Tag.fetchAll()).map((tag) => {
+    return [tag.get("id"), tag.get("name")];
   });
+
+  let searchForm = createSearchForm(allCategories, allTags);
+
+  let q = Product.collection();
+
+  searchForm.handle(req, {
+    empty: async (form) => {
+      let products = await q.fetch({
+        withRelated: ["category", "tags"],
+      });
+      res.render("products/index", {
+        products: products.toJSON(),
+        form: form.toHTML(bootstrapField),
+      });
+    },
+    error: async (form) => {
+      let products = await q.fetch({
+        withRelated: ["category", "tags"],
+      });
+      res.render("products/index", {
+        products: products.toJSON(),
+        form: form.toHTML(bootstrapField),
+      });
+    },
+    success: async (form) => {
+      if (form.data.name) {
+        q = q.where("name", "like", "%" + req.query.name + "%");
+      }
+
+      //if user selected one of the category
+      if (form.data.category_id && form.data.category_id !== "0") {
+        //products table join categories table where category_id===categories.id
+        q.where("category_id", "=", form.data.category_id);
+      }
+
+      if (form.data.min_cost) {
+        q = q.where("cost", ">=", req.query.min_cost);
+      }
+
+      if (form.data.max_cost) {
+        q = q.where("cost", "<=", req.query.max_cost);
+      }
+
+      if (form.data.tags) {
+        q.query("join", "products_tags", "products.id", "product_id").where(
+          "tag_id",
+          "in",
+          form.data.tags.split(",")
+        );
+        console.log("tag query string", q);
+      }
+
+      let products = await q.fetch({
+        withRelated: ["category", "tags"],
+      });
+
+      res.render("products/index", {
+        products: products.toJSON(),
+        form: form.toHTML(bootstrapField),
+      });
+    },
+  });
+
+  // let products = await Product.collection().fetch({
+  //   //append cat into product table
+  //   withRelated: ["category", "tags"],
+  //   //append tags to the products
+  // });
+  // console.log("products", products.toJSON());
+  // res.render("products/index", {
+  //   //convert data into json format
+  //   products: products.toJSON(),
+  // });
 });
 
 const getAllTags = async () => {

@@ -57,10 +57,25 @@ app.use((req, res, next) => {
 //has to be behind the session
 app.use(csrf());
 
-//global middleshare to share each token applied to all routes
+//separate code from above below csrfToken();
+app.use(function (err, req, res, next) {
+  //if the error code is whatever, we flash the message then redirect back
+  //below error is a specific error for custom error message
+
+  if (err && err.code == "EBADCSRFTOKEN") {
+    req.flash("error_messages", "The form has expired. Please try again");
+    //it is like press back button in browser
+    res.redirect("back");
+  } else {
+    next();
+  }
+});
+
+// //global middleshare to share each token applied to all routes
 app.use(function (req, res, next) {
   //req.csrfToken generates a new token and saved to current session file
   //then made available to res hbs
+
   res.locals.csrfToken = req.csrfToken();
   next();
 });

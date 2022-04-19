@@ -79,16 +79,23 @@ router.post("/login", (req, res) => {
         //check if password matches
         if (user.get("password") === getHashedPassword(form.data.password)) {
           //store user details in session
+          console.log("password is the same");
+          // res.send("logged in");
+
           req.session.user = {
             id: user.get("id"),
             username: user.get("username"),
             email: user.get("email"),
           };
+
+          console.log("we created session user", req.session.user);
+
+          res.redirect("/users/profile");
+
           req.flash(
             "success_messages",
             "welcome back, " + user.get("username")
           );
-          res.redirect("/users/profile");
         } else {
           req.flash("error_messages", "Sorry, the auth details does not work");
           res.redirect("/users/login");
@@ -106,8 +113,10 @@ router.post("/login", (req, res) => {
 
 router.get("/profile", (req, res) => {
   const user = req.session.user;
+  console.log("user in session on profile", user);
   if (!user) {
     req.flash("error_messages", "You do not have permission to view this");
+    console.log("there is no user in session due to vs");
     res.redirect("/users/login");
   } else {
     res.render("users/profile", {
