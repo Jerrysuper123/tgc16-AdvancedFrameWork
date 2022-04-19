@@ -82,8 +82,10 @@ app.use(function (req, res, next) {
 
 //route
 const landingRoutes = require("./routes/landing");
+// const productRoutes = require("./routes/product");
 const productRoutes = require("./routes/product");
 const userRoutes = require("./routes/users");
+const cloudinaryRoutes = require("./routes/cloudinary.js");
 async function main() {
   app.get("/", (req, res) => {
     res.render("landing/index");
@@ -98,13 +100,15 @@ async function main() {
   });
 
   //whenever route is /laning, use landingRoutes
-  app.use("/landing", landingRoutes);
   app.use("/products", productRoutes);
+  app.use("/landing", landingRoutes);
+
   app.use("/users", userRoutes);
+  app.use("/cloudinary", cloudinaryRoutes);
 }
 main();
 
 //listen
-app.listen(3000, (req, res) => {
+app.listen(8080, (req, res) => {
   console.log("server has started");
 });

@@ -60,6 +60,9 @@ const createProductForm = (categories, tags) => {
       widget: widgets.multipleSelect(),
       choices: tags, //tags must be in the form of [[1: "snack"],[2: "healthy"]]
     }),
+    image_url: fields.string({
+      widget: widgets.hidden(),
+    }),
   });
 };
 

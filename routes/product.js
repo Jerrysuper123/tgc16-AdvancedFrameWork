@@ -105,31 +105,31 @@ router.get("/create", checkIfAuthenticated, async (req, res) => {
   // const allCategories = await Category.fetchAll().map((cat) => {
   //   return [cat.get("id"), cat.get("name")];
   // });
-
+  console.log("see create table");
   const allCategories = await getAllCategories();
   const allTags = await getAllTags();
 
   const productForm = createProductForm(allCategories, allTags);
   res.render("products/create", {
     form: productForm.toHTML(bootstrapField),
+    cloudinaryName: process.env.CLOUDINARY_NAME,
+    cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+    cloudinaryPreset: process.env.CLOUDINARY_UPLOAD_PRESET,
   });
 });
 
-const getAllCategories = async () => {
-  const allCategories = await Category.fetchAll().map((cat) => {
-    return [cat.get("id"), cat.get("name")];
-  });
-  return allCategories;
-};
-
-router.post("/create", checkIfAuthenticated, async (req, res) => {
+router.post("/create", async (req, res) => {
+  console.log("see post data");
   const allCategories = await getAllCategories();
 
   const productForm = createProductForm(allCategories);
+
+  console.log(req.body);
+
   productForm.handle(req, {
     success: async (form) => {
       // create a new row for the Product modal
-
+      console.log("posted to products successfully");
       //separate tag info with other form data info
       let { tags, ...productData } = form.data;
       const product = new Product(productData);
@@ -155,6 +155,8 @@ router.post("/create", checkIfAuthenticated, async (req, res) => {
 
     // render the orignal form if there is error
     error: async (form) => {
+      console.log("posted to products failed");
+
       res.render("products/create", {
         form: form.toHTML(bootstrapField),
       });
@@ -162,13 +164,20 @@ router.post("/create", checkIfAuthenticated, async (req, res) => {
   });
 });
 
+const getAllCategories = async () => {
+  const allCategories = await Category.fetchAll().map((cat) => {
+    return [cat.get("id"), cat.get("name")];
+  });
+  return allCategories;
+};
+
 router.get("/:product_id/update", async (req, res) => {
   const productId = req.params.product_id;
   const product = await Product.where({
-    id: productId,
+    id: parseInt(productId),
   }).fetch({
     require: true,
-    withRelated: ["tags"],
+    withRelated: ["tags", "category"],
   });
 
   const allTags = await getAllTags();
@@ -180,6 +189,7 @@ router.get("/:product_id/update", async (req, res) => {
   productForm.fields.cost.value = product.get("cost");
   productForm.fields.description.value = product.get("description");
   productForm.fields.category_id.value = product.get("category_id");
+  productForm.fields.image_url.value = product.get("image_url");
 
   //fill in the multi-select for the tags
   //pluck allows you to retrieve one field only (like mongo projection)
@@ -191,6 +201,9 @@ router.get("/:product_id/update", async (req, res) => {
   res.render("products/update", {
     form: productForm.toHTML(bootstrapField),
     product: product.toJSON(),
+    cloudinaryName: process.env.CLOUDINARY_NAME,
+    cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+    cloudinaryPreset: process.env.CLOUDINARY_UPLOAD_PRESET,
   });
 });
 

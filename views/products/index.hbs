@@ -17,6 +17,7 @@
                 <th>Cost</th>
                 <th>Description</th>
                 <th>Tags</th>
+                <th>img</th>
                 <th></th>
             </tr>
         </thead>
@@ -35,6 +36,9 @@
                         <span class="badge bg-primary">{{this.name}}</span>
                         {{/each}}
                     </td>
+                    <td><img src="{{this.image_url}}"
+                    width="200"
+                    /></td>
                     <td>
                     <a class="btn btn-success" href="/products/{{this.id}}/update">update</a>
                      <a class="btn btn-danger" href="/products/{{this.id}}/delete">delete</a></td>
