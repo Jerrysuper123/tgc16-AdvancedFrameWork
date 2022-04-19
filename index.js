@@ -30,7 +30,7 @@ app.use(
     //store session in file on server
     store: new FileStore(),
     //hash session id
-    secret: "keyboard cat",
+    secret: process.env.SESSION_SECRET_KEY,
     resave: false,
     //create new session id there is none
     saveUninitialized: true,
